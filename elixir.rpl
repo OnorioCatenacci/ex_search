@@ -1,0 +1,33 @@
+---- -*- Mode: rpl; -*-                                                                            
+---- vim:syn=rosie
+----
+---- elixir.rpl     Rosie Pattern Language patterns the Elixir programming language
+----
+---- AUTHORS: Onorio Catenacci
+
+rpl 1.2
+
+package elixir
+
+-- comment = "#"
+comment = "\u0023"
+comment_line = {comment [:space:]+ .* $}
+-- test comment_line accepts "# This is a comment"
+-- test comment_line rejects "defmodule Test do #an end of line comment"
+
+module_name = {[:upper:]{1}{[:alnum:]/"."}+}
+-- test module_name accepts "Test"
+-- test module_name accepts "Test.Submodule"
+-- test module_name rejects "test"
+-- test module_name rejects "test.Submodule"
+
+module = {"defmodule" [:space:]+ module_name [:space:]+ "do" [:space:]+}
+-- test module accepts "defmodule Test do   "
+-- test module accepts "defmodule       Test      do   "
+-- test module rejects "defmodule test do   "
+
+function_name = {[:lower:]/"_"}+
+-- test function_name accepts "my_function"
+-- test function_name accepts "myfunction"
+-- test function_name rejects "Myfunction"
+-- test function_name rejects "My_function"

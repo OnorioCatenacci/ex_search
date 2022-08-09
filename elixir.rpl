@@ -11,23 +11,29 @@ package elixir
 
 -- comment = "#"
 comment = "\u0023"
-comment_line = {comment [:space:]+ .* $}
+comment_line = {comment ~ .* $}
 -- test comment_line accepts "# This is a comment"
 -- test comment_line rejects "defmodule Test do #an end of line comment"
 
-module_name = {[:upper:]{1}{[:alnum:]/"."}+}
--- test module_name accepts "Test"
--- test module_name accepts "Test.Submodule"
--- test module_name rejects "test"
--- test module_name rejects "test.Submodule"
+local alias module_name = {[:upper:]{1}{[:alnum:]/"."}+}
+-- test local module_name accepts "Test"
+-- test local module_name accepts "Test.Submodule"
+-- test local module_name rejects "test"
+-- test local module_name rejects "test.Submodule"
 
-module = {"defmodule" [:space:]+ module_name [:space:]+ "do" [:space:]+}
+alias module = {"defmodule" ~ module_name ~ "do" ~}
 -- test module accepts "defmodule Test do   "
 -- test module accepts "defmodule       Test      do   "
 -- test module rejects "defmodule test do   "
 
-function_name = {[:lower:]/"_"}+
--- test function_name accepts "my_function"
--- test function_name accepts "myfunction"
--- test function_name rejects "Myfunction"
--- test function_name rejects "My_function"
+local alias function_name = {[[:lower:] [_]]}+
+-- test local function_name accepts "my_function"
+-- test local function_name accepts "myfunction"
+-- test local function_name rejects "Myfunction"
+-- test local function_name rejects "My_function"
+
+alias function = {"def"[p]{0,1} ~ function_name ~ "do"}
+-- test function accepts "def test_func do"
+-- test function accepts "def testfunc do"
+-- test function rejects "def BadName do"
+-- test function rejects "def bad.name do"

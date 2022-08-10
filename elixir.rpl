@@ -18,11 +18,13 @@ comment_line = {comment ~ .* $}
 local alias module_name = {[:upper:]{1}{[:alnum:]/"."}+}
 -- test local module_name accepts "Test"
 -- test local module_name accepts "Test.Submodule"
+-- test local module_name accepts "Test.Submodule.Submodule"
 -- test local module_name rejects "test"
 -- test local module_name rejects "test.Submodule"
 
 alias module = {"defmodule" ~ module_name ~ "do" ~}
 -- test module accepts "defmodule Test do   "
+-- test module accepts "defmodule Test do"
 -- test module accepts "defmodule       Test      do   "
 -- test module rejects "defmodule test do   "
 

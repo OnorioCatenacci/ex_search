@@ -10,32 +10,49 @@ rpl 1.2
 package elixir
 
 -- comment = "#"
-comment = "\u0023"
-comment_line = {comment ~ .* $}
+comment_char = "\u0023"
+comment_line_start = (comment_char [:space:]*)
+comment_line = (comment_line_start .* $)
 -- test comment_line accepts "# This is a comment"
 -- test comment_line rejects "defmodule Test do #an end of line comment"
 
-local alias module_name = {[:upper:]{1}{[:alnum:]/"."}+}
+local alias module_name = {~ [:upper:]{1}{[:alnum:]/"."}+ ~}
+-- test local module_name accepts " Test "
 -- test local module_name accepts "Test"
+-- test local module_name accepts " Test.Submodule "
 -- test local module_name accepts "Test.Submodule"
+-- test local module_name accepts " Test.Submodule.Submodule "
 -- test local module_name accepts "Test.Submodule.Submodule"
+-- test local module_name accepts " DtwRunnerWeb.ChannelCase "
+-- test local module_name accepts "DtwRunnerWeb.ChannelCase"
+-- test local module_name rejects " test "
 -- test local module_name rejects "test"
+-- test local module_name rejects " test.Submodule "
 -- test local module_name rejects "test.Submodule"
 
-alias module = {"defmodule" ~ module_name ~ "do" ~}
+alias module = (!comment_line_start "defmodule"  module_name  "do" [:space:]*)
 -- test module accepts "defmodule Test do   "
 -- test module accepts "defmodule Test do"
+-- test module accepts "defmodule DtwRunnerWeb.ChannelCase do"
 -- test module accepts "defmodule       Test      do   "
 -- test module rejects "defmodule test do   "
+-- test module rejects "#defmodule Test do"
+-- test module rejects "# defmodule Test do"
+-- test module includes module_name "defmodule DtwRunnerWeb.ChannelCase do"
 
-local alias function_name = {[[:lower:] [_]]}+
+local alias function_name = (~ {[[:lower:] [_]]}+ ~)
 -- test local function_name accepts "my_function"
 -- test local function_name accepts "myfunction"
 -- test local function_name rejects "Myfunction"
 -- test local function_name rejects "My_function"
 
-alias function = {"def"[p]{0,1} ~ function_name ~ "do"}
+alias function = {!comment_line_start "def"[p]{0,1} ~ function_name ~ "do"}
 -- test function accepts "def test_func do"
 -- test function accepts "def testfunc do"
+-- test function accepts "defp my_test_func do"
 -- test function rejects "def BadName do"
 -- test function rejects "def bad.name do"
+-- test function rejects "# def test_func do"
+-- test function rejects "# defp test_func do"
+-- test function rejects "#def test_func do"
+-- test function rejects "#defp test_func do"

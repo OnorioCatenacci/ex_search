@@ -12,7 +12,7 @@ done
 
 
 # By default skip the mix.exs file
-ignore_files=("is:mix.exs" "is:credo.exs" "is:formatter.exs")
+ignore_files=("is:mix.exs" "is:credo.exs" "is:.formatter.exs")
 ign_files=()
 for i in "${ignore_files[@]}"; do
   ign_files+=("--ignore-file=$i");

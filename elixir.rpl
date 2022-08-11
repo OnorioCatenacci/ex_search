@@ -38,7 +38,6 @@ alias module = (!comment_line_start "defmodule"  module_name  "do" [:space:]*)
 -- test module rejects "defmodule test do   "
 -- test module rejects "#defmodule Test do"
 -- test module rejects "# defmodule Test do"
--- test module includes module_name "defmodule DtwRunnerWeb.ChannelCase do"
 
 local alias function_name = (~ {[[:lower:] [_]]}+ ~)
 -- test local function_name accepts "my_function"
@@ -46,13 +45,29 @@ local alias function_name = (~ {[[:lower:] [_]]}+ ~)
 -- test local function_name rejects "Myfunction"
 -- test local function_name rejects "My_function"
 
-alias function = {!comment_line_start "def"[p]{0,1} ~ function_name ~ "do"}
--- test function accepts "def test_func do"
--- test function accepts "def testfunc do"
--- test function accepts "defp my_test_func do"
--- test function rejects "def BadName do"
--- test function rejects "def bad.name do"
--- test function rejects "# def test_func do"
--- test function rejects "# defp test_func do"
--- test function rejects "#def test_func do"
--- test function rejects "#defp test_func do"
+local alias parameter = [:alnum:]+
+
+local alias parameter_list = {"(" ({parameter} ","{0,1})* ")"}
+-- test local parameter_list accepts "(a, b)"
+-- test local parameter_list accepts "()"
+-- test local parameter_list accepts "(a)"
+-- test local parameter_list accepts "(a, b, c)"
+-- test local parameter_list rejects "a,b"
+-- test local parameter_list rejects "("
+-- test local parameter_list rejects " (a, b)"
+
+
+alias function = {!comment_line_start "def"[p]{0,1} ~ function_name parameter_list ~ "do"}
+-- test function accepts "def test_func() do"
+-- test function accepts "def test_func(a) do"
+-- test function accepts "def test_func(a,b) do"
+-- test function accepts "def testfunc() do"
+-- test function accepts "defp my_test_func() do"
+-- test function rejects "def BadName() do"
+-- test function rejects "def bad.name() do"
+-- test function rejects "# def test_func() do"
+-- test function rejects "def test_func (a) do"
+-- test function rejects "# defp test_func() do"
+-- test function rejects "#def test_func() do"
+-- test function rejects "#defp test_func() do"
+

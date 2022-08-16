@@ -21,6 +21,6 @@ done
 pager=less
 file_types=elixir:ext:ex,exs,eex,heex
 
-
-ack $1 --word-regexp --pager="$pager" --type-set="$file_types" "${ign_dirs[@]}" "${ign_files[@]}" --noenv
+search_string=$1
+ack "$search_string" --pager="$pager" --type-set="$file_types" "${ign_dirs[@]}" "${ign_files[@]}" --noenv "${@:2}"
 

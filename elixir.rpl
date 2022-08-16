@@ -30,7 +30,12 @@ local alias module_name = {~ [:upper:]{1}{[:alnum:]/"."}+ ~}
 -- test local module_name rejects " test.Submodule "
 -- test local module_name rejects "test.Submodule"
 
-alias module = (!comment_line_start "defmodule"  module_name  "do" [:space:]*)
+grammar 
+   module_start = "defmodule"  module_name  "do" [:space:]*
+in 
+   module = {module_start / (!comment_line_start module_start)}
+end
+
 -- test module accepts "defmodule Test do   "
 -- test module accepts "defmodule Test do"
 -- test module accepts "defmodule DtwRunnerWeb.ChannelCase do"
@@ -66,7 +71,6 @@ alias function = {!comment_line_start "def"[p]{0,1} ~ function_name parameter_li
 -- test function rejects "def BadName() do"
 -- test function rejects "def bad.name() do"
 -- test function rejects "# def test_func() do"
--- test function rejects "def test_func (a) do"
 -- test function rejects "# defp test_func() do"
 -- test function rejects "#def test_func() do"
 -- test function rejects "#defp test_func() do"

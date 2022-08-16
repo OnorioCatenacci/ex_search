@@ -31,7 +31,7 @@ local alias module_name = {~ [:upper:]{1}{[:alnum:]/"."}+ ~}
 -- test local module_name rejects "test.Submodule"
 
 grammar 
-   module_start = "defmodule"  module_name  "do" [:space:]*
+   module_start = ^"defmodule"  module_name  "do" [:space:]*$
 in 
    module = {module_start / (!comment_line_start module_start)}
 end

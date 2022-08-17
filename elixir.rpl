@@ -16,22 +16,22 @@ comment_line = (comment_line_start .* $)
 -- test comment_line accepts "# This is a comment"
 -- test comment_line rejects "defmodule Test do #an end of line comment"
 
-local alias module_name = {~ [:upper:]{1}{[:alnum:]/"."}+ ~}
--- test local module_name accepts " Test "
--- test local module_name accepts "Test"
--- test local module_name accepts " Test.Submodule "
--- test local module_name accepts "Test.Submodule"
--- test local module_name accepts " Test.Submodule.Submodule "
--- test local module_name accepts "Test.Submodule.Submodule"
--- test local module_name accepts " DtwRunnerWeb.ChannelCase "
--- test local module_name accepts "DtwRunnerWeb.ChannelCase"
--- test local module_name rejects " test "
--- test local module_name rejects "test"
--- test local module_name rejects " test.Submodule "
--- test local module_name rejects "test.Submodule"
+module_name = {~ [:upper:]{1}{[:alnum:]/"."}+ ~}
+-- test module_name accepts " Test "
+-- test module_name accepts "Test"
+-- test module_name accepts " Test.Submodule "
+-- test module_name accepts "Test.Submodule"
+-- test module_name accepts " Test.Submodule.Submodule "
+-- test module_name accepts "Test.Submodule.Submodule"
+-- test module_name accepts " DtwRunnerWeb.ChannelCase "
+-- test module_name accepts "DtwRunnerWeb.ChannelCase"
+-- test module_name rejects " test "
+-- test module_name rejects "test"
+-- test module_name rejects " test.Submodule "
+-- test module_name rejects "test.Submodule"
 
 grammar 
-   module_start = ^"defmodule"  module_name  "do" [:space:]*$
+   module_start = ^[:space:]* "defmodule"  module_name  "do" [:space:]*$
 in 
    module = {module_start / (!comment_line_start module_start)}
 end
@@ -44,25 +44,30 @@ end
 -- test module rejects "#defmodule Test do"
 -- test module rejects "# defmodule Test do"
 
-local alias function_name = (~ {[[:lower:] [_]]}+ ~)
--- test local function_name accepts "my_function"
--- test local function_name accepts "myfunction"
--- test local function_name rejects "Myfunction"
--- test local function_name rejects "My_function"
+alias function_name = (~ {[[:lower:] [_]]}+ ~)
+-- test function_name accepts "my_function"
+-- test function_name accepts "myfunction"
+-- test function_name rejects "Myfunction"
+-- test function_name rejects "My_function"
+-- test function_name rejects "my.function"
 
-local alias parameter = [:alnum:]+
+local alias parameter = ([_]{0,1}[:alnum:])+
 
 local alias parameter_list = {"(" ({parameter} ","{0,1})* ")"}
 -- test local parameter_list accepts "(a, b)"
 -- test local parameter_list accepts "()"
 -- test local parameter_list accepts "(a)"
 -- test local parameter_list accepts "(a, b, c)"
+-- test local parameter_list accepts "(_a, b, c)"
 -- test local parameter_list rejects "a,b"
 -- test local parameter_list rejects "("
 -- test local parameter_list rejects " (a, b)"
 
-
-alias function = {!comment_line_start "def"[p]{0,1} ~ function_name parameter_list ~ "do"}
+grammar
+   function_start = ^"def"[p]{0,1} [:space:]+ function_name parameter_list [:space:]+ "do"$
+in 
+   function = {function_start / (!comment_line_start function_start)}
+end
 -- test function accepts "def test_func() do"
 -- test function accepts "def test_func(a) do"
 -- test function accepts "def test_func(a,b) do"

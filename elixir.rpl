@@ -63,11 +63,7 @@ local alias parameter_list = {"(" ({parameter} ","{0,1})* ")"}
 -- test local parameter_list rejects "("
 -- test local parameter_list rejects " (a, b)"
 
-grammar
-   function_start = ^"def"[p]{0,1} [:space:]+ function_name parameter_list [:space:]+ "do"$
-in 
-   function = {function_start / (!comment_line_start function_start)}
-end
+alias function = {!comment_line_start "def"[p]{0,1} ~ function_name parameter_list ~ "do"}
 -- test function accepts "def test_func() do"
 -- test function accepts "def test_func(a) do"
 -- test function accepts "def test_func(a,b) do"

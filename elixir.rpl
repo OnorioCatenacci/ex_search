@@ -33,7 +33,7 @@ module_name = {~ [:upper:]{1}{[:alnum:]/"."}+ ~}
 grammar 
    module_start = ^[:space:]* "defmodule"  module_name  "do" [:space:]*$
 in 
-   module = {module_start / (!comment_line_start module_start)}
+   module = !comment_line_start module_start
 end
 
 -- test module accepts "defmodule Test do   "

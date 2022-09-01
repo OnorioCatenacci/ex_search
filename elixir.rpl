@@ -10,10 +10,10 @@ rpl 1.2
 package elixir
 
 -- comment = "#"
-comment_char = "\u0023"
-comment_line_start = (comment_char [:space:]*)
-comment_line = (comment_line_start .* $)
+comment_char = "#"
+comment_line = (^ ~ comment_char .* $)
 -- test comment_line accepts "# This is a comment"
+-- test comment_line accepts "#### This is also a comment"
 -- test comment_line rejects "defmodule Test do #an end of line comment"
 
 module_name = {~ [:upper:]{1}{[:alnum:]/"."}+ ~}
@@ -33,7 +33,7 @@ module_name = {~ [:upper:]{1}{[:alnum:]/"."}+ ~}
 grammar 
    module_start = ^[:space:]* "defmodule"  module_name  "do" [:space:]*$
 in 
-   module = !comment_line_start module_start
+   module = ~ !comment_char module_start
 end
 
 -- test module accepts "defmodule Test do   "
@@ -63,12 +63,11 @@ local alias parameter_list = {"(" ({parameter} ","{0,1})* ")"}
 -- test local parameter_list rejects "("
 -- test local parameter_list rejects " (a, b)"
 
-alias function = {!comment_line_start "def"[p]{0,1} ~ function_name parameter_list ~ "do"}
+alias function = ^!comment_char "def"[p]{0,1} ~ function_name ![:space:] parameter_list ~ "do" ~$
 -- test function accepts "def test_func() do"
 -- test function accepts "def test_func(a) do"
 -- test function accepts "def test_func(a,b) do"
 -- test function accepts "def testfunc() do"
--- test function accepts "defp my_test_func() do"
 -- test function rejects "def BadName() do"
 -- test function rejects "def bad.name() do"
 -- test function rejects "# def test_func() do"
